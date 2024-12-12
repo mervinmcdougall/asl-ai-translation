@@ -70,10 +70,16 @@ def update_history (last_char,prediction,character_count,limit): # Calculate pre
     if character_count >= limit:
         print(prediction)
 
-        if prediction == 's':
+        if prediction == 'Space':
             text_display.insert(tk.END, ' ')
-        elif prediction == 'd':
+        elif prediction == 'Delete':
             text_display.delete('end-2c','end')
+        elif prediction == 'Speak':
+            speak()
+        elif prediction == 'Exit':
+            root.quit()
+        elif prediction == 'Clear':
+            text_display.delete("1.0", tk.END)
         else:
             text_display.insert(tk.END, prediction)
 
@@ -85,6 +91,7 @@ def speak(): # Say it
     path = os.path.join(current_dir, 'final_project.mp3')
 
     language = 'en' # Language in which you want to convert
+    # language = 'es'
     text = text_display.get("1.0", "end-1c")  
     myobj = gTTS(text=text, lang=language, slow=False)
 
@@ -133,9 +140,12 @@ def update_frame(last_char, character_count): # Update Frame
             last_char, character_count = update_history(last_char, pred_character, character_count, limit)
 
         # Draw rectangle and annotation
-        cv2.rectangle(frame_rgb, (min_x - 10, min_y - 10), (max_x + 10, max_y + 10), (0, 0, 0), 2)
+
+        
+
+        cv2.rectangle(frame_rgb, (min_x - 10, min_y - 10), (max_x + 10, max_y + 10), (255, 0, 0), 2)
         final_text = str(pred_character)+"-"+str(confidence)
-        cv2.putText(frame_rgb, final_text, (min_x, min_y - 10), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (0, 0, 0), 3, cv2.LINE_AA)
+        cv2.putText(frame_rgb, final_text, (min_x, min_y - 15), cv2.FONT_HERSHEY_SIMPLEX, 1.3, (255, 0, 0), 2, cv2.LINE_AA)
 
 
     # Convert the frame to an Image
@@ -157,7 +167,7 @@ def update_frame(last_char, character_count): # Update Frame
 
 # define the saving directory
 current_dir = os.path.dirname(os.path.abspath(__file__))
-path = os.path.join(current_dir, '..\model\\asl_model.keras')
+path = os.path.join(current_dir, 'asl_model.keras')
 # Load the model
 model = tf.keras.models.load_model(path)
 
@@ -172,14 +182,14 @@ camera_canvas = tk.Canvas(root, width=640, height=480)
 camera_canvas.grid(row=0, column=0, columnspan=3)
 
 # Display area for recognized text
-text_display = tk.Text(root, width=40, height=5, font=("Arial", 12))
+text_display = tk.Text(root, width=40, height=2, font=("Arial", 20))
 text_display.grid(row=1, column=0, columnspan=3, padx=5, pady=5)
 
 # Buttons for clear, say, and quit
-clear_button = tk.Button(root, text="Clear All", width=15, bg="lemon chiffon", command=lambda: text_display.delete("1.0", tk.END))
+clear_button = tk.Button(root, text="Clear All", width=20, bg="lemon chiffon", command=lambda: text_display.delete("1.0", tk.END))
 clear_button.grid(row=2, column=0, padx=5, pady=5)
 
-speak_button = tk.Button(root, text="Say it", width=15, bg="green",fg="white", command=lambda: speak())
+speak_button = tk.Button(root, text="Say it", width=20, bg="green",fg="white", command=lambda: speak())
 speak_button.grid(row=2, column=1, padx=5, pady=5)
 
 quit_button = tk.Button(root, text="Quit", width=15, bg="red",fg="white", command=root.quit)
@@ -201,7 +211,7 @@ hands = mp_hands.Hands(static_image_mode=True, min_detection_confidence=0.45)
 # initialize variables
 last_char = ""
 character_count = 0
-labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'd', 's']
+labels = ['A', 'B', 'C', 'Clear', 'D', 'E', 'Exit', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'Speak', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'Delete', 'Space']
 limit = 10
 
 # Start updating the frames
